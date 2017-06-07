@@ -1,0 +1,1 @@
+%{"varint": {:git, "https://github.com/jamen/varint.git", "862ec48c83de8a6538b206db2e7c8f06b54e1c7a", [branch: "signed-leb128"]}}
