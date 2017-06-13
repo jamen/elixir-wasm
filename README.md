@@ -5,7 +5,11 @@
 
 Defines an [IR](https://en.wikipedia.org/wiki/Intermediate_representation) for [Web Assembly](http://webassembly.org/) in Elixir, and functions for parsing and compiling `.wasm` binaries from it.  The WASM IR is inspired from [Elixir's quoted expressions](http://elixir-lang.org/getting-started/meta/quote-and-unquote.html) and [Erlang's absform](http://erlang.org/doc/apps/erts/absform.html) so it is familiar :smile:
 
-**Note:** This is a work in progress, probably not usable in anything at the moment
+**Note:** This is untested and very unstable.  Not production ready
+
+ - [x] [Binary Format](http://webassembly.github.io/spec/binary)
+ - [ ] [Validation](http://webassembly.github.io/spec/validation/index.html
+ - [ ] Unit tests
 
 ## Install
 
