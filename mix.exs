@@ -30,7 +30,7 @@ defmodule WASM.Mixfile do
   #
   # Type `mix help deps` for more examples and options
   defp deps do
-    [{:varint, github: "jamen/varint", branch: "signed-leb128"}]
+    []
   end
 
   defp package do

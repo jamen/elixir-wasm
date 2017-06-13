@@ -1,6 +1,29 @@
-defmodule WASM do
+defmodule WASM.Binary do
   @moduledoc """
-  
+    Creates binary from a tree that closely resembles the WASM spec.  This does not validate the code, because it only implements the rules from the "Binary Format" section in the spec.  See `WASM.Validation` for that layer 
+
+    The nodes take a simple tuple form:
+
+      ```elixir
+      {:name, ...attributes}
+      ```
+
+    For example, values:
+
+      ```elixir
+      {:u32, 1000}
+      {:u64, 10000000000}
+      [;s32, -12345]
+      # ...
+      ```
+
+    Or sections
+
+      ```elixir
+      {:section, :codesec, [
+        # ...
+      ]}
+      ```
   """
 
   # See http://webassembly.github.io/spec/binary/types.html#value-types
@@ -33,12 +56,14 @@ defmodule WASM do
     const: 0x00,
     var: 0x01
   }
- 
+
   # values
-  def compile({:u32, value}), do: Varint.ULEB128.encode(value)
-  def compile({:u64, value}), do: Varint.ULEB128.encode(value)
-  def compile({:s32, value}), do: Varint.SLEB128.encode(value)
-  def compile({:s64, value}), do: Varint.SLEB128.encode(value)
+  def compile({:u32, value}), do: WASM.LEB128.encode_unsigned(value)
+  def compile({:u64, value}), do: WASM.LEB128.encode_unsigned(value)
+  def compile({:s32, value}), do: WASM.LEB128.encode_signed(value)
+  def compile({:s64, value}), do: WASM.LEB128.encode_signed(value)
+  def compile({:i32, value}), do: WASM.LEB128.encode_signed(value)
+  def compile({:i64, value}), do: WASM.LEB128.encode_signed(value)
   def compile({:f32, value}), do: <<value::float-32>>
   def compile({:f64, value}), do: <<value::float-64>>
 
@@ -51,37 +76,40 @@ defmodule WASM do
   def compile({:name, name}), do: <<name::utf8>>
 
   # valtypes
-  def compile({:type, :val, type}), do: <<@val[type]>>
+  def compile({:valtype, type}), do: <<@val[type]>>
 
   # blocktypes
-  def compile({:type, :block, :empty}), do: <<@empty>>
-  def compile({:type, :block, type}), do: <<@val[type]>>
+  def compile({:blocktype, :empty}), do: <<@empty>>
+  def compile({:blocktype, type}), do: <<@val[type]>>
 
   # functypes
-  def compile({:type, :function, param_types, result_types}) do
+  def compile({:functype, param_types, result_types}) do
     <<@func,
       compile({:vector, param_types})::binary,
       compile({:vector, result_types})::binary>>
   end
 
   # limits
-  def compile({:type, :limit, min}) do
+  def compile({:limits, min}) do
     <<@limit.min, compile({:u32, min})::binary>>
   end
-  def compile({:type, :limit, min, max}) do
+  def compile({:limits, min, max}) do
     <<@limit.min_max, compile({:u32, min})::binary, compile({:u32, max})::binary>>
   end
 
+  # memtype
+  def compile({:memtype, limit}), do: compile(limit)
+
   # tabletypes
-  def compile({:type, :table, elem_type, limit}) do
+  def compile({:tabletype, elem_type, limit}) do
     <<compile(elem_type)::binary, compile(limit)::binary>>
   end
 
   # elemtypes (TODO: this seems odd, broken?)
-  def compile({:type, :elem}), do: <<@elem>>
+  def compile(:elemtype), do: <<@elem>>
 
   # globaltypes
-  def compile({:type, :global, val_type, mutability}), do
+  def compile({:globaltype, val_type, mutability}) do
     <<@val[val_type], @mut[mutability]>>
   end
 
@@ -102,7 +130,7 @@ defmodule WASM do
   def compile({:loop, blocktype, instructions}) do
     <<0x03,
       compile(blocktype)::binary,
-      sequence(instrs)::binary,
+      sequence(instructions)::binary,
       0x0B>>
   end
 
@@ -131,9 +159,9 @@ defmodule WASM do
   # select instruction
   def compile(:select), do: <<0x1B>>
 
-  # TODO: All variable instructions
+  # TODO: All variable instructionsSo I rejoined baggo because I missed the GitHub feed
   
-  def compile({:memarg, align, offset}), do
+  def compile({:memarg, align, offset}) do
     <<compile({:u32, align})::binary,
       compile({:u32, offset})::binary>>
   end
@@ -215,8 +243,8 @@ defmodule WASM do
   def compile({:ge_s, :i64}), do: <<0x59>>
   def compile({:ge_u, :i32}), do: <<0x4F>>
   def compile({:ge_u, :i64}), do: <<0x5A>>
-  def compile({:lt, :f32}), do: <<0x60>>
-  def compile({:lt, :f64}), do: <<0x66>>
+  def compile({:ge, :f32}), do: <<0x60>>
+  def compile({:ge, :f64}), do: <<0x66>>
 
   def compile({:clz, :i32}), do: <<0x67>>
   def compile({:ctz, :i32}), do: <<0x68>>
@@ -236,7 +264,6 @@ defmodule WASM do
   def compile({:shr_u, :i32}), do: <<0x76>>
   def compile({:rotl, :i32}), do: <<0x77>>
   def compile({:rotr, :i32}), do: <<0x78>>
-
   def compile({:clz, :i64}), do: <<0x79>>
   def compile({:ctz, :i64}), do: <<0x7A>>
   def compile({:popcnt, :i64}), do: <<0x7B>>
@@ -316,7 +343,124 @@ defmodule WASM do
   # expr instruction
   def compile({:expr, ins}), do: <<sequence(ins)::binary, 0x0B>>
 
+  # Index encodings
+  def compile({:typeidx, value}), do: compile({:u32, value})
+  def compile({:funcidx, value}), do: compile({:u32, value})
+  def compile({:tableidx, value}), do: compile({:u32, value})
+  def compile({:memidx, value}), do: compile({:u32, value})
+  def compile({:globalidx, value}), do: compile({:u32, value})
+  def compile({:localidx, value}), do: compile({:u32, value})
+  def compile({:labelidx, value}), do: compile({:u32, value})
+
+  # Module section ids 
+  @ids %{
+    customsec: 0,
+    typesec: 1,
+    importsec: 2,
+    funcsec: 3,
+    tablesec: 4,
+    memsec: 5,
+    globalsec: 6,
+    exportsec: 7,
+    startsec: 8,
+    elementsec: 9,
+    codesec: 10,
+    datasec: 11,
+  }
+
+  @desc %{
+    func: 0x00,
+    table: 0x01,
+    mem: 0x02,
+    global: 0x03
+  }
+
+  # Empty or optional sections
+  # TODO: add them
+
+  # Custom section where the contents are raw bytes
+  def compile({:customsec, contents}), do: section(:customsec, contents)
+  def compile({:typesec, types}), do: section(:typesec, {:vector, types})
+  def compile({:importsec, imports}), do: section(:importsec, {:vector, imports})
+  def compile({:funcsec, indices}), do: section(:funcsec, {:vector, indices})
+  def compile({:tablesec, tables}), do: section(:tablesec, {:vector, tables})
+  def compile({:memsec, mems}), do: section(:memsec, {:vector, mems})
+  def compile({:globalsec, globals}), do: section(:globalsec, {:vector, globals})
+  def compile({:exportsec, exports}), do: section(:exportsec, {:vector, exports})
+  def compile({:startsec, start}), do: section(:startsec, start)
+  def compile({:elemsec, segments}), do: section(:elemsec, {:vector, segments})
+  def compile({:codesec, codes}), do: section(:codesec, {:vector, codes})
+  def compile({:datasec, segments}), do: section(:datasec, {:vector, segments})
+
+  # Type section
+
+  # Import section
+  
+  def compile({:import, module, name, desc}) do
+    <<compile(module)::binary, compile(name)::binary, compile(desc)::binary>>
+  end
+  def compile({:importdesc, type, param}) do
+    <<@desc[type], compile(param)::binary>>
+  end
+
+  # Function section
+
+  # Table section
+  def compile({:table, type}), do: compile(type)
+
+  # Memory section
+
+  def compile({:global, type, expr}) do
+    <<compile(type)::binary, compile(expr)::binary>>
+  end
+
+  # Export section
+  def compile({:export, name, desc}) do
+    <<compile(name)::binary, compile(desc)::binary>>
+  end
+  def compile({:exportdesc, type, id}) do
+    <<@desc[type], compile(id)::binary>>
+  end
+
+  # Start section
+  def compile({:start, funcidx}), do: compile(funcidx)
+
+  # Element section
+  def compile({:elem, tableidx, expr, funcidxs}) do
+    <<compile(tableidx)::binary,
+      compile(expr)::binary,
+      compile({:vector, funcidxs})::binary>>
+  end
+
+  # Code section
+  def compile({:code, size, {:func, func}}) do
+    <<compile({:u32, size})::binary, sequence(func)::binary>>
+  end
+
+  # Data section
+  def compile({:data, memidx, expr, data}) do
+    <<compile(memidx)::binary,
+      compile(expr)::binary,
+      compile({:vector, data})::binary>>
+  end
+
+  @magic <<0x00, 0x61, 0x73, 0x6D>>
+  @version <<0x01, 0x00, 0x00, 0x00>>
+
+  # Module def
+  def compile({:module, sections}) do
+    <<@magic::binary,
+      @version::binary,
+      sequence(sections)::binary>>
+  end
+
   # Compile sequence of instructions
   defp sequence(seq), do: Enum.map(seq, &compile(&1)) |> Enum.join
+
+    # Generic section
+  defp section(id, value) do
+    contents = compile(value)
+    <<@ids[id], compile({:u32, byte_size(contents)})::binary, contents::binary>>
+  end
 end
 
