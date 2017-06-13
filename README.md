@@ -8,7 +8,7 @@ Defines an [IR](https://en.wikipedia.org/wiki/Intermediate_representation) for [
 **Note:** This is untested and very unstable.  Not production ready
 
  - [x] [Binary Format](http://webassembly.github.io/spec/binary)
- - [ ] [Validation](http://webassembly.github.io/spec/validation/index.html
+ - [ ] [Validation](http://webassembly.github.io/spec/validation/index.html)
  - [ ] Unit tests
 
 ## Install
