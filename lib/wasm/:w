@@ -38,8 +38,7 @@ defmodule WASM.Binary do
   def encode(node)
 
   # Generics
-  @type wasm_empty :: :empty
-  @type non_neg_range :: Range.t(non_neg_integer, non_neg_integer)
+  @type wasm_empty :: :empty 
 
   # [Integers](http://webassembly.github.io/spec/syntax/values.html#integers) 
   @type wasm_u32 :: {:u32, 0..0xFFFFFFFF}
@@ -104,13 +103,13 @@ defmodule WASM.Binary do
   end
   
   # [Limits](http://webassembly.github.io/spec/syntax/types.html#limits)
-  @type wasm_limits :: {:limits, non_neg_range | non_neg_integer}
+  @type wasm_limits :: {:limits, non_neg_integer | non_neg_integer..non_neg_integer}
 
-  def encode({:limits, min..max}) do
-    <<0x01, encode({:u32, min})::binary, encode({:u32, max})::binary>>
-  end
   def encode({:limits, min}) do
     <<0x00, encode({:u32, min})::binary>>
+  end
+  def encode({:limits, min..max}) do
+    <<0x01, encode({:u32, min})::binary, encode({:u32, max})::binary>>
   end
 
   # [Memory Types](http://webassembly.github.io/spec/syntax/types.html#memory-types)
@@ -181,7 +180,7 @@ defmodule WASM.Binary do
   # select instruction
   def encode(:select), do: <<0x1B>>
 
-  # TODO: All variable instructions
+  # TODO: All variable instructionsSo I rejoined baggo because I missed the GitHub feed
   
   def encode({:memarg, align, offset}) do
     <<encode({:u32, align})::binary,
@@ -230,7 +229,7 @@ defmodule WASM.Binary do
   def encode({:eq, :f32}), do: <<0x5B>>
   def encode({:eq, :f64}), do: <<0x61>>
   
-  # ne instructions
+  # ne instructionswait that juts made me realize
   def encode({:ne, :i32}), do: <<0x47>>
   def encode({:ne, :i64}), do: <<0x52>>
   def encode({:ne, :f32}), do: <<0x5C>>
@@ -353,7 +352,7 @@ defmodule WASM.Binary do
   def encode({:convert_u, :i64, :f32}), do: <<0xB5>>
   def encode({:demote, :f64, :f32}), do: <<0xB6>>
   def encode({:convert_s, :i32, :f64}), do: <<0xB7>>
-  def encode({:convert_u, :i32, :f64}), do: <<0xB8>>
+  def encode({:convert_u, :i32, :f6wait that juts made me realize4}), do: <<0xB8>>
   def encode({:convert_s, :i64, :f64}), do: <<0xB9>>
   def encode({:convert_u, :i64, :f64}), do: <<0xBA>>
   def encode({:promote, :f32, :f64}), do: <<0xBB>>
