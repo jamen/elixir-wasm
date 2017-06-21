@@ -28,28 +28,36 @@ defmodule WASM.Binary do
       ```
   """
   
-  @type wasm_node :: wasm_empty | wasm_u32 | wasm_u64 | wasm_s32 | wasm_s64
-                   | wasm_i32 | wasm_i64 | wasm_f32 | wasm_f64 | wasm_vec
-                   | wasm_name | wasm_valtype | wasm_blocktype | wasm_functype
-                   | wasm_limits | wasm_memtype | wasm_tabletype
-                   | wasm_globaltype 
+  @type wasm_value :: wasm_u32 | wasm_u64 | wasm_s32 | wasm_s64 | wasm_i32
+                    | wasm_i64 | wasm_f32 | wasm_f64 | wasm_vec | wasm_name
+
+  @type wasm_type :: wasm_valtype | wasm_resulttype | wasm_functype |
+                   | wasm_limits | wasm_memtype | wasm_tabletype |
+                   | wasm_globaltype
+
+  @type wasm_instr :: wasm_unreachable | wasm_nop | wasm_block 
+
+  @type wasm_node :: wasm_empty | wasm_value | wasm_type | wasm_instr
 
   @spec encode(wasm_node) :: binary
   def encode(node)
 
   # Generics
-  @type wasm_empty :: :empty
-  @type non_neg_range :: Range.t(non_neg_integer, non_neg_integer)
+  @typep non_neg_range :: Range.t(non_neg_integer, non_neg_integer)
+  @typep u32 :: 0..0xFFFFFFFF
+  @typep u64 :: 0..0xFFFFFFFFFFFFFFFF
+  @typep s32 :: -0x80000000..0x7FFFFFFF
+  @typep s64 :: -0x8000000000000000..0x7FFFFFFFFFFFFFFF
 
   # [Integers](http://webassembly.github.io/spec/syntax/values.html#integers) 
-  @type wasm_u32 :: {:u32, 0..0xFFFFFFFF}
-  @type wasm_u64 :: {:u64, 0..0xFFFFFFFFFFFFFFFF}
+  @type wasm_u32 :: {:u32, u32}
+  @type wasm_u64 :: {:u64, u32}
   
-  @type wasm_s32 :: {:s32, -0x80000000..0x7FFFFFFF}
-  @type wasm_s64 :: {:s64, -0x8000000000000000..0x7FFFFFFFFFFFFFFF}
+  @type wasm_s32 :: {:s32, s32}
+  @type wasm_s64 :: {:s64, s32}
   
-  @type wasm_i32 :: {:i32, -0x80000000..0x7FFFFFFF}
-  @type wasm_i64 :: {:i64, -0x8000000000000000..0x7FFFFFFFFFFFFFFF}
+  @type wasm_i32 :: {:i32, s32}
+  @type wasm_i64 :: {:i64, s32}
  
   def encode({:u32, value}), do: WASM.LEB128.encode_unsigned(value)
   def encode({:u64, value}), do: WASM.LEB128.encode_unsigned(value)
@@ -82,17 +90,18 @@ defmodule WASM.Binary do
   def encode({:name, name}), do: <<name::utf8>>
 
   # [Value Types](http://webassembly.github.io/spec/binary/types.html#value-types)
-  @type wasm_valtype :: {:valtype, :i32 | :i64 | :f32 | :f64}
+  @type wasm_valtype :: :i32 | :i64 | :f32 | :f64
   
-  @valtype %{ i32: 0x7F, i64: 0xFE, f32: 0x7D, f64: 0x7C }
-
-  def encode({:valtype, type}), do: <<@valtype[type]>>
+  def encode(:i32), do: <<0x7F>>
+  def encode(:i64), do: <<0xFE>>
+  def encode(:f32), do: <<0x7D>>
+  def encode(:f64), do: <<0x7C>>
 
   # [Result Types](http://webassembly.github.io/spec/syntax/types.html#result-types)
-  @type wasm_blocktype :: {:blocktype, wasm_valtype | wasm_empty} 
+  @type wasm_resulttype :: {:resulttype, [wasm_valtype]} 
   
-  def encode({:blocktype, :empty}), do: <<0x40>>
-  def encode({:blocktype, type}), do: encode(type)
+  def encode({:resulttype, , []}), do: <<0x40>>
+  def encode({:resulttype, types}), do: sequence(types)
 
   # [Function Types](http://webassembly.github.io/spec/syntax/types.html#value-types)
   @type wasm_functype :: {:functype, wasm_vec(wasm_valtype), wasm_vec(wasm_valtype)}
@@ -135,39 +144,38 @@ defmodule WASM.Binary do
 
   # TODO: [External Types](http://webassembly.github.io/spec/syntax/types.html#external-types)
 
-  # unreachable instruction
+  
+  # ["Nothing/Trap" Control Instructions](http://webassembly.github.io/spec/syntax/instructions.html#control-instructions)
+  @type wasm_nop :: :nop
+  @type wasm_unreachable :: :unreachable
+
   def encode(:unreachable), do: <<0x00>>
-  # nop instruction
   def encode(:nop), do: <<0x01>>
 
-  # block instruction
-  def encode({:block, blocktype, instructions}) do
-    <<0x02,
-      encode(blocktype)::binary,
-      sequence(instructions)::binary,
-      0x0B>>
+  # ["Structured" Control Instructions](http://webassembly.github.io/spec/syntax/instructions.html#control-instructions)
+  @type wasm_block :: {:block, wasm_resulttype, [wasm_instr]}
+  @type wasm_loop :: {:loop, wasm_resulttype, [wasm_instr]}
+  @type wasm_if :: {:if, wasm_resulttype, [wasm_instr]}
+                 | {:if, wasm_resulttype, [wasm_instr], [wasm_instr]}
+
+  @control_ops %{
+    block: 0x02, loop: 0x03, if: 0x04 }
+  
+  def encode({name, resulttype, instrs})
+    when name == :block
+    when name == :loop
+    when name == :if
+  do
+    <<@control_ops[instr],
+      encode(resulttype)::binary,
+      sequence(instrs)::binary,
+      0x0b>>
   end
 
-  # loop instruction
-  def encode({:loop, blocktype, instructions}) do
-    <<0x03,
-      encode(blocktype)::binary,
-      sequence(instructions)::binary,
-      0x0B>>
-  end
-
-  # if (no else) instruction
-  def encode({:if, blocktype, instructions}) do
+  # (if with else)
+  def encode({:if, resulttype, consequent, alternate}) do
     <<0x04,
-      encode(blocktype)::binary,
-      sequence(instructions)::binary,
-      0x0B>>
-  end
-
-  # if/else instruction
-  def encode({:if, blocktype, consequent, alternate}) do
-    <<0x04,
-      encode(blocktype)::binary,
+      encode(resulttype)::binary,
       sequence(consequent)::binary,
       0x05,
       sequence(alternate)::binary,
@@ -182,43 +190,67 @@ defmodule WASM.Binary do
   def encode(:select), do: <<0x1B>>
 
   # TODO: All variable instructions
+    
+  # [Memory Instructions](http://webassembly.github.io/spec/binary/instructions.html#memory-instructions)
+  @type wasm_memarg :: {:memarg, u32, u32}
   
+  @type wasm_load :: {:load, wasm_valtype, wasm_memarg}
+  @type wasm_load8_s :: {:load8_s, :i32 | :i64, wasm_memarg}
+  @type wasm_load8_u :: {:load8_s, :i32 | :i64, wasm_memarg}
+  @type wasm_load16_s :: {:load16_s, :i32 | :i64, wasm_memarg}
+  @type wasm_load16_u :: {:load16_u, :i32 | :i64, wasm_memarg} 
+  @type wasm_load32_s :: {:load32_u, :i64, wasm_memarg}
+  @type wasm_load32_u :: {:load32_s, :i64, wasm_memarg}
+  @type wasm_store :: {:store, wasm_valtype, wasm_memarg}
+  @type wasm_store8 :: {:store8, :i32 | :i64, wasm_memarg}
+  @type wasm_store16 :: {:store16, :i32 | :i64, wasm_memarg}
+  @type wasm_store32 :: {:store32, :i64, wasm_memarg}
+
+  @mem_ops %{
+    {:load, :i32} => 0x28,
+    {:load, :i64} => 0x29,
+    {:load, :f32} => 0x2A,
+    {:load, :f64} => 0x2B,
+    {:load8_s, :i32} => 0x2C,
+    {:load8_u, :i32} => 0x2D,
+    {:load16_s, :i32} => 0x2E,
+    {:load16_u, :i32} => 0x2F,
+    {:load8_s, :i64} => 0x30,
+    {:load8_u, :i64} => 0x31,
+    {:load16_s, :i64} => 0x32,
+    {:load16_u, :i64} => 0x33,
+    {:load32_s, :i64} => 0x34,
+    {:load32_u, :i64} => 0x35,
+    {:store, :i32} => 0x36,
+    {:store, :i64} => 0x37,
+    {:store, :f32} => 0x38,
+    {:store, :f64} => 0x39,
+    {:store8, :i32} => 0x3A,
+    {:store16, :i32} => 0x3B,
+    {:store8, :i64} => 0x3C,
+    {:store16, :i64} => 0x3D,
+    {:store32, :i64} => 0x3E }
+
+  def encode({instr, valtype, mem}) when @mem_ops[{instr, valtype}] do
+    <<@mem_ops[{instr, valtype}], encode(mem)::binary>>
+  end
+  def encode(:current_memory), do: <<0x3F, 0x00>>
+  def encode(:grow_memory), do: <<0x40, 0x00>>
+
   def encode({:memarg, align, offset}) do
     <<encode({:u32, align})::binary,
       encode({:u32, offset})::binary>>
   end
- 
-  def encode({:load, :i32, mem}), do: <<0x28, encode(mem)::binary>>
-  def encode({:load, :i64, mem}), do: <<0x29, encode(mem)::binary>>
-  def encode({:load, :f32, mem}), do: <<0x2A, encode(mem)::binary>>
-  def encode({:load, :f64, mem}), do: <<0x2B, encode(mem)::binary>>
-  def encode({:load8_s, :i32, mem}), do: <<0x2C, encode(mem)::binary>>
-  def encode({:load8_u, :i32, mem}), do: <<0x2D, encode(mem)::binary>>
-  def encode({:load16_s, :i32, mem}), do: <<0x2E, encode(mem)::binary>>
-  def encode({:load16_u, :i32, mem}), do: <<0x2F, encode(mem)::binary>>
-  def encode({:load8_s, :i64, mem}), do: <<0x30, encode(mem)::binary>>
-  def encode({:load8_u, :i64, mem}), do: <<0x31, encode(mem)::binary>>
-  def encode({:load16_s, :i64, mem}), do: <<0x32, encode(mem)::binary>>
-  def encode({:load16_u, :i64, mem}), do: <<0x33, encode(mem)::binary>>
-  def encode({:load32_s, :i64, mem}), do: <<0x34, encode(mem)::binary>>
-  def encode({:load32_u, :i64, mem}), do: <<0x35, encode(mem)::binary>>
-  def encode({:store, :i32, mem}), do: <<0x36, encode(mem)::binary>>
-  def encode({:store, :i64, mem}), do: <<0x37, encode(mem)::binary>>
-  def encode({:store, :f32, mem}), do: <<0x38, encode(mem)::binary>>
-  def encode({:store, :f64, mem}), do: <<0x39, encode(mem)::binary>>
-  def encode({:store8, :i32, mem}), do: <<0x3A, encode(mem)::binary>>
-  def encode({:store16, :i32, mem}), do: <<0x3B, encode(mem)::binary>>
-  def encode({:store8, :i64, mem}), do: <<0x3C, encode(mem)::binary>>
-  def encode({:store16, :i64, mem}), do: <<0x3D, encode(mem)::binary>>
-  def encode({:store32, :i64, mem}), do: <<0x3E, encode(mem)::binary>>
-  def encode(:current_memory), do: <<0x3F, 0x00>>
-  def encode(:grow_memory), do: <<0x40, 0x00>>
 
-  # constant instructions
-  def encode({:i32, :const, value}), do: <<0x41, encode({:i32, value})::binary>>
-  def encode({:i64, :const, value}), do: <<0x42, encode({:i64, value})::binary>>
-  def encode({:f32, :const, value}), do: <<0x43, encode({:f32, value})::binary>>
-  def encode({:f64, :const, value}), do: <<0x44, encode({:f64, value})::binary>>
+  # ["Const" Numberic Instructions](http://webassembly.github.io/spec/binary/instructions.html#numeric-instructions)
+  @type wasm_const :: {:const, wasm_valtype, wasm_value}
+
+  @const_ops %{
+    i32: 0x41, i64: 0x42, f32: 0x43, f64: 0x44 }
+
+  def encode({:const, type, value}), do
+    <<@const_ops[type], encode({type, value})::binary>>
+  end
 
   # eqz instructions
   def encode({:eqz, :i32}), do: <<0x45>>
