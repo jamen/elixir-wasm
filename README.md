@@ -3,7 +3,7 @@
 
 > Build and compile WASM IR for Elixir
 
-Defines an [IR](https://en.wikipedia.org/wiki/Intermediate_representation) for [Web Assembly](http://webassembly.org/) in Elixir, and functions for parsing and compiling `.wasm` binaries from it.  The WASM IR is inspired from [Elixir's quoted expressions](http://elixir-lang.org/getting-started/meta/quote-and-unquote.html) and [Erlang's absform](http://erlang.org/doc/apps/erts/absform.html) so it is familiar :smile:
+A module that encodes an [IR](https://en.wikipedia.org/wiki/Intermediate_representation) [for Web Assembly](http://webassembly.org/) that is inspired from [Elixir's quoted expressions](http://elixir-lang.org/getting-started/meta/quote-and-unquote.html) and [Erlang's absform](http://erlang.org/doc/apps/erts/absform.html) so it is familiar :smile:
 
 **Note:** This is untested and very unstable.  Not production ready
 
@@ -27,13 +27,5 @@ mix deps.get
 
 ## Usage
 
-### `WASM.compile(node)`
+See [wasm on hexdocs](https://hexdocs.pm/wasm) for docs on the `WASM.*` modules.
 
-Compiles an IR node tree into a binary.
-
-```js
-binary = WASM.compile({:block, {:type, :block, :i32}, [
-  {:div_s, :i32},
-  {:eq, :i32}
-]})
-```
