@@ -8,9 +8,7 @@
     <title>API Reference – wasm v0.0.1</title>
     <link rel="stylesheet" href="dist/app-4ecae1abb8.css" />
     
-      <link rel="canonical" href="https://hexdocs.pm/wasm/api-reference.html" />
-    
-    <script src="dist/sidebar_items-8c8fbf8c68.js"></script>
+    <script src="dist/sidebar_items-bfa004e365.js"></script>
   </head>
   <body data-type="extras">
     <script>try { if(localStorage.getItem('night-mode')) document.body.className += ' night-mode'; } catch (e) { }</script>
@@ -78,7 +76,9 @@
       <div class="summary-row">
   <div class="summary-signature"><a href="WASM.Binary.html">WASM.Binary</a></div>
   
-    <div class="summary-synopsis"><p>Creates binary from a tree that closely resembles the WASM spec.  This does not validate the code, because it only implements the rules from the “Binary Format” section in the spec.  See <code class="inline">WASM.Validation</code> for that layer</p>
+    <div class="summary-synopsis"><p>Defines an atom-and-tuple IR for the <a href="http://webassembly.github.io/spec/binary">Binary Format</a>.
+Gives functions for encoding the nodes, and typespecs to (partially) validate
+the tree structure</p>
 </div>
   
 </div>
