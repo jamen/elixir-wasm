@@ -3,7 +3,7 @@
 
 > Modules for using WASM with Elixir
 
-Defines an [IR](https://en.wikipedia.org/wiki/Intermediate_representation) [for Web Assembly](http://webassembly.org/) made of atoms and tuples, like [Elixir's AST](http://elixir-lang.org/getting-started/meta/quote-and-unquote.html) or [Erlang's absform](http://erlang.org/doc/apps/erts/absform.html)), and provides modules for encoding, decoding, typing, validating, and creating WASM modules. See [Roadmap](#roadmap) below for what is done so far.
+Defines an [IR](https://en.wikipedia.org/wiki/Intermediate_representation) [for Web Assembly](http://webassembly.org/) made of tuples and atoms, like [Elixir's AST](http://elixir-lang.org/getting-started/meta/quote-and-unquote.html) or [Erlang's absform](http://erlang.org/doc/apps/erts/absform.html).  Has modules for encoding, decoding, typing, validating, and creating WASM modules. See [Roadmap](#roadmap) below for what is done so far.
 
 **Note:** This is untested and unstable.  Not production ready!
 
