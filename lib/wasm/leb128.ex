@@ -1,6 +1,6 @@
 defmodule WASM.LEB128 do
   @moduledoc """
-  For encoding signed and unsigned LEB128 integers
+  Functions for encoding signed and unsigned LEB128 integers
   
   Inspired from `Varint`'s encode functions
   """

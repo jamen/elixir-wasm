@@ -8,7 +8,7 @@
     <title>WASM.IR – wasm v0.0.1</title>
     <link rel="stylesheet" href="dist/app-4ecae1abb8.css" />
     
-    <script src="dist/sidebar_items-665ddee0a9.js"></script>
+    <script src="dist/sidebar_items-b4a8b93531.js"></script>
   </head>
   <body data-type="modules">
     <script>try { if(localStorage.getItem('night-mode')) document.body.className += ' night-mode'; } catch (e) { }</script>
@@ -73,16 +73,7 @@
 
       
         <section id="moduledoc">
-          <p>Defines a tuple-based IR for the <a href="http://webassembly.github.io/spec/binary">Binary Format</a>.
-Only contains typespecs, used in other modules to reference node types and validate the tree</p>
-<ul>
-<li><a href="WASM.html"><code class="inline">WASM</code></a>
-</li>
-<li><a href="WASM.Binary.html"><code class="inline">WASM.Binary</code></a>
-</li>
-<li><code class="inline">WASM.Validation</code>
-</li>
-</ul>
+          <p>Types for the tuple-based IR, used in other <code class="inline">WASM.*</code> modules.</p>
 
         </section>
       
@@ -420,7 +411,7 @@ types</p>
     </a>
     <span class="signature">any_instr()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L98" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L93" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -447,7 +438,7 @@ types</p>
     </a>
     <span class="signature">any_node()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L14" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L9" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -475,7 +466,7 @@ types</p>
     </a>
     <span class="signature">any_type()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L84" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L79" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -510,7 +501,7 @@ types</p>
     </a>
     <span class="signature">any_value()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L34" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L29" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -565,7 +556,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">block()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L103" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L98" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -592,7 +583,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">const()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L122" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L117" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -619,7 +610,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">elemtype()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L95" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L90" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -646,7 +637,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">f32()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L55" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L50" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -674,7 +665,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">f64()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L58" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L53" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -702,7 +693,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">functype()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L91" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L86" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -729,7 +720,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">globaltype()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L96" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L91" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -756,7 +747,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">i32()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L49" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L44" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -784,7 +775,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">i64()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L52" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L47" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -812,7 +803,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">if()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L105" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L100" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -841,7 +832,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">limits()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L92" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L87" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -868,7 +859,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">load()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L110" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L105" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -895,7 +886,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">load16_s()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L113" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L108" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -922,7 +913,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">load16_u()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L114" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L109" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -949,7 +940,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">load32_s()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L115" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L110" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -976,7 +967,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">load32_u()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L116" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L111" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -1003,7 +994,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">load8_s()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L111" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L106" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -1030,7 +1021,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">load8_u()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L112" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L107" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -1057,7 +1048,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">loop()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L104" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L99" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -1084,7 +1075,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">memarg()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L108" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L103" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -1111,7 +1102,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">memtype()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L93" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L88" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -1138,7 +1129,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">name()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L79" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L74" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -1167,7 +1158,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">nop()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L100" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L95" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -1194,7 +1185,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">resulttype()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L89" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L84" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -1221,7 +1212,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">s32()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L43" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L38" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -1249,7 +1240,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">s64()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L46" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L41" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -1277,7 +1268,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">store()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L117" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L112" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -1304,7 +1295,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">store16()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L119" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L114" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -1331,7 +1322,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">store32()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L120" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L115" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -1358,7 +1349,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">store8()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L118" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L113" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -1385,7 +1376,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">tabletype()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L94" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L89" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -1412,7 +1403,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">u32()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L37" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L32" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -1440,7 +1431,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">u64()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L40" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L35" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -1468,7 +1459,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">unreachable()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L101" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L96" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -1495,7 +1486,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">valtype()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L87" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L82" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -1522,7 +1513,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">vec()</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L61" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L56" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
@@ -1550,7 +1541,7 @@ vector of a specified type</p>
     </a>
     <span class="signature">vec(type)</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L72" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/ir.ex#L67" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>

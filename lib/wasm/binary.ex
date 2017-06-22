@@ -1,10 +1,9 @@
 defmodule WASM.Binary do
   @moduledoc """
-  Gives functions for encoding the nodes, and typespecs to (partially) validate
-  the tree structure.
+  Functions for encoding and decoding `WASM.IR` from the [Binary Format](http://webassembly.github.io/spec/binary)
   
-  This module is _only_ for the binary format and **can output invalid code**
-  with improper use.  For something more high-level, see 
+  This module _only_ deals with the binary format and **can output invalid code**
+  with improper use.  For something more high-level that includes validation, see 
 
     - `WASM`
     - `WASM.Module`

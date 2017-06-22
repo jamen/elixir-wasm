@@ -1,11 +1,6 @@
 defmodule WASM.IR do
   @moduledoc """
-  Defines a tuple-based IR for the [Binary Format](http://webassembly.github.io/spec/binary).
-  Only contains typespecs, used in other modules to reference node types and validate the tree
-
-    - `WASM`
-    - `WASM.Binary`
-    - `WASM.Validation`
+  Types for the tuple-based IR, used in other `WASM.*` modules.
   """
 
   @typedoc """

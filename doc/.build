@@ -5,7 +5,7 @@ fonts/icomoon.eot
 fonts/icomoon.svg
 fonts/icomoon.ttf
 fonts/icomoon.woff
-dist/sidebar_items-665ddee0a9.js
+dist/sidebar_items-b4a8b93531.js
 api-reference.html
 404.html
 WASM.html
@@ -13,4 +13,5 @@ WASM.Binary.html
 WASM.IR.html
 WASM.LEB128.html
 WASM.Module.html
+WASM.Validation.html
 index.html

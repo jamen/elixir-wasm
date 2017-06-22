@@ -8,7 +8,7 @@
     <title>API Reference – wasm v0.0.1</title>
     <link rel="stylesheet" href="dist/app-4ecae1abb8.css" />
     
-    <script src="dist/sidebar_items-665ddee0a9.js"></script>
+    <script src="dist/sidebar_items-b4a8b93531.js"></script>
   </head>
   <body data-type="extras">
     <script>try { if(localStorage.getItem('night-mode')) document.body.className += ' night-mode'; } catch (e) { }</script>
@@ -76,37 +76,42 @@
       <div class="summary-row">
   <div class="summary-signature"><a href="WASM.html">WASM</a></div>
   
-    <div class="summary-synopsis"><p>Functions for encoding, decoding, and validating WASM modules</p>
+    <div class="summary-synopsis"><p>Functions for encoding, decoding, and validating complete WASM modules</p>
 </div>
   
 </div>
 <div class="summary-row">
   <div class="summary-signature"><a href="WASM.Binary.html">WASM.Binary</a></div>
   
-    <div class="summary-synopsis"><p>Gives functions for encoding the nodes, and typespecs to (partially) validate
-the tree structure</p>
+    <div class="summary-synopsis"><p>Functions for encoding and decoding <a href="WASM.IR.html"><code class="inline">WASM.IR</code></a> from the <a href="http://webassembly.github.io/spec/binary">Binary Format</a></p>
 </div>
   
 </div>
 <div class="summary-row">
   <div class="summary-signature"><a href="WASM.IR.html">WASM.IR</a></div>
   
-    <div class="summary-synopsis"><p>Defines a tuple-based IR for the <a href="http://webassembly.github.io/spec/binary">Binary Format</a>.
-Only contains typespecs, used in other modules to reference node types and validate the tree</p>
+    <div class="summary-synopsis"><p>Types for the tuple-based IR, used in other <code class="inline">WASM.*</code> modules</p>
 </div>
   
 </div>
 <div class="summary-row">
   <div class="summary-signature"><a href="WASM.LEB128.html">WASM.LEB128</a></div>
   
-    <div class="summary-synopsis"><p>For encoding signed and unsigned LEB128 integers</p>
+    <div class="summary-synopsis"><p>Functions for encoding signed and unsigned LEB128 integers</p>
 </div>
   
 </div>
 <div class="summary-row">
   <div class="summary-signature"><a href="WASM.Module.html">WASM.Module</a></div>
   
-    <div class="summary-synopsis"><p>Symbolizes a complete WASM module inside Elixir</p>
+    <div class="summary-synopsis"><p>Struct symbolizing a complete WASM module inside Elixir</p>
+</div>
+  
+</div>
+<div class="summary-row">
+  <div class="summary-signature"><a href="WASM.Validation.html">WASM.Validation</a></div>
+  
+    <div class="summary-synopsis"><p>Functions for validating <a href="WASM.IR.html"><code class="inline">WASM.IR</code></a> trees</p>
 </div>
   
 </div>
