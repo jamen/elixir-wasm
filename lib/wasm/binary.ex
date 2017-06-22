@@ -2,9 +2,7 @@ defmodule WASM.Binary do
   @moduledoc """
   Defines an atom-and-tuple IR for the [Binary Format](http://webassembly.github.io/spec/binary).
   Gives functions for encoding the nodes, and typespecs to (partially) validate
-  the tree structure.
-    
-  **Note:** This module is bare and **can output invalid code**.  See these
+  the tree structure.  This module **can output invalid code**.  See these
   modules for more high-level usage and further validation of WASM in Elixir:
 
     - `WASM`
@@ -36,13 +34,19 @@ defmodule WASM.Binary do
 
   This includes:
 
-    - [`wasm_s32`](#t:wasm_s32/0), [`wasm_u32`](#t:wasm_u32/), `wasm_i32`: 32-bit signed, unsigned, and
-      uninterpreted integers.
-
-    - Integers: Signed, unsigned, and uninterpreted, with 32-bit and 64-bit
-    - Floating-Point: 32-bit and 64-bit
-    - Vectors: A fixed sequence of values (or any nodes)
-    - Names: A UTF-8 name
+    - [`wasm_s32`](#t:wasm_s32/0), [`wasm_u32`](#t:wasm_u32/0),
+      [`wasm_i32`](#t:wasm_i32/0): 32-bit signed/unsigned/uninterpreted integer
+    
+    - [`wasm_s64`](#t:wasm_s64/0), [`wasm_u64`](#t:wasm_u64/0),
+      [`wasm_i64`](#t:wasm_i64/0): 64-bit signed/unsigned/uninterpreted integer
+    
+    - [`wasm_f32`](#t:wasm_f32/0), [`wasm_f64`](#t:wasm_f64/0): 32-bit or 64-bit
+      floating-point
+    
+    - [`wasm_vec`](#t:wasm_vec/0), [`wasm_vec(type)`](#t:wasm_vec/1): Vector, or
+      vector of a specified type
+    
+    - [`wasm_name`](#t:wasm_name/0): A UTF-8 name
   """
   @type wasm_value :: wasm_u32 | wasm_u64 | wasm_s32 | wasm_s64 | wasm_i32
                     | wasm_i64 | wasm_f32 | wasm_f64 | wasm_vec | wasm_name
@@ -66,15 +70,12 @@ defmodule WASM.Binary do
   @type wasm_i64 :: {:i64, signed_64_integer}
  
   def encode({:u32, value}), do: WASM.LEB128.encode_unsigned(value)
-  def encode({:u64, value}), do: WASM.LEB128.encode_unsigned(value)
- 
+  def encode({:u64, value}), do: WASM.LEB128.encode_unsigned(value) 
   def encode({:s32, value}), do: WASM.LEB128.encode_signed(value)
   def encode({:s64, value}), do: WASM.LEB128.encode_signed(value)
-  
   def encode({:i32, value}), do: WASM.LEB128.encode_signed(value)
   def encode({:i64, value}), do: WASM.LEB128.encode_signed(value)
   
-  # [Floating-Point](http://webassembly.github.io/spec/syntax/values.html#floating-point)
   @typedoc "32-bit floating-point."
   @type wasm_f32 :: {:f32, float_32}
 
@@ -84,22 +85,17 @@ defmodule WASM.Binary do
   def encode({:f32, value}), do: <<value::float-32>>
   def encode({:f64, value}), do: <<value::float-64>>
 
-  # [Vectors](http://webassembly.github.io/spec/syntax/values.html#vectors)
   @typedoc "Any vector (type of the vector itself)."
   @type wasm_vec :: wasm_vec(wasm_node)
   
   @typedoc """
-    Vector of a specified type.
+  Vector of a specified type.
 
-      # Give the type 
+      # Given the type 
       wasm_vec(wasm_u32)
 
-      # Symbolizes something like:
-      {:vec, [
-        {:u32, 1},
-        {:u32, 2},
-        # ...
-      ]}
+      # An example tree
+      {:vec, [{:u32, 1}, {:u32, 2}, ...]}
   """
   @type wasm_vec(type) :: {:vec, [type]}
   
@@ -108,9 +104,8 @@ defmodule WASM.Binary do
       sequence(items)::binary>> 
   end
 
-  # [Names](http://webassembly.github.io/spec/syntax/values.html#names)
   @typedoc """
-   Unicode name (UTF-8 encoded)
+  Unicode name (UTF-8 encoded)
     
       {:name, "foobar"}
   """
