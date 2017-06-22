@@ -1,139 +1,53 @@
 defmodule WASM.Binary do
   @moduledoc """
-  Defines an atom-and-tuple IR for the [Binary Format](http://webassembly.github.io/spec/binary).
   Gives functions for encoding the nodes, and typespecs to (partially) validate
-  the tree structure.  This module **can output invalid code**.  See these
-  modules for more high-level usage and further validation of WASM in Elixir:
+  the tree structure.
+  
+  This module is _only_ for the binary format and **can output invalid code**
+  with improper use.  For something more high-level, see 
 
     - `WASM`
     - `WASM.Module`
     - `WASM.Validation`
-
-  ## Main Concepts
-    
-    - [`encode(node)`](#encode/1)
-    - [`wasm_node`](#t:wasm_node/0)
-    - [`wasm_value`](#t:wasm_value/0)
-    - [`wasm_type`](#t:wasm_type/0)
-    - [`wasm_instr`](#t:wasm_instr/0)
   """
-  
-  @typedoc "Any WASM node."
-  @type wasm_node :: wasm_value | wasm_type | wasm_instr
   
   @doc """
   Encodes a node into its [Binary Format](http://webassembly.github.io/spec/binary/index.html).
 
   TODO: Examples tests
   """
-  @spec encode(wasm_node) :: binary
+  @spec encode(WASM.IR.any_node) :: binary
   def encode(node)
 
-  @typedoc """
-  Any [value](http://webassembly.github.io/spec/binary/values.html) node
-
-  This includes:
-
-    - [`wasm_s32`](#t:wasm_s32/0), [`wasm_u32`](#t:wasm_u32/0),
-      [`wasm_i32`](#t:wasm_i32/0): 32-bit signed/unsigned/uninterpreted integer
-    
-    - [`wasm_s64`](#t:wasm_s64/0), [`wasm_u64`](#t:wasm_u64/0),
-      [`wasm_i64`](#t:wasm_i64/0): 64-bit signed/unsigned/uninterpreted integer
-    
-    - [`wasm_f32`](#t:wasm_f32/0), [`wasm_f64`](#t:wasm_f64/0): 32-bit or 64-bit
-      floating-point
-    
-    - [`wasm_vec`](#t:wasm_vec/0), [`wasm_vec(type)`](#t:wasm_vec/1): Vector, or
-      vector of a specified type
-    
-    - [`wasm_name`](#t:wasm_name/0): A UTF-8 name
-  """
-  @type wasm_value :: wasm_u32 | wasm_u64 | wasm_s32 | wasm_s64 | wasm_i32
-                    | wasm_i64 | wasm_f32 | wasm_f64 | wasm_vec | wasm_name
-
-  @typedoc "Unsigned 32-bit integer."
-  @type wasm_u32 :: {:u32, unsigned_32_integer}
-  
-  @typedoc "Unsigned 64-bit integer."
-  @type wasm_u64 :: {:u64, unsigned_64_integer}
-  
-  @typedoc "Signed 32-bit integer."
-  @type wasm_s32 :: {:s32, signed_32_integer}
-  
-  @typedoc "Signed 64-bit integer."
-  @type wasm_s64 :: {:s64, signed_64_integer}
-  
-  @typedoc "Uninterpreted 32-bit integer (not signed or unsigned)."
-  @type wasm_i32 :: {:i32, signed_32_integer}
-
-  @typedoc "Uninterpreted 64-bit integer (not signed or unsigned)."
-  @type wasm_i64 :: {:i64, signed_64_integer}
- 
   def encode({:u32, value}), do: WASM.LEB128.encode_unsigned(value)
   def encode({:u64, value}), do: WASM.LEB128.encode_unsigned(value) 
   def encode({:s32, value}), do: WASM.LEB128.encode_signed(value)
   def encode({:s64, value}), do: WASM.LEB128.encode_signed(value)
   def encode({:i32, value}), do: WASM.LEB128.encode_signed(value)
   def encode({:i64, value}), do: WASM.LEB128.encode_signed(value)
-  
-  @typedoc "32-bit floating-point."
-  @type wasm_f32 :: {:f32, float_32}
-
-  @typedoc "64-bit floating point."
-  @type wasm_f64 :: {:f64, float_64}
-  
+    
   def encode({:f32, value}), do: <<value::float-32>>
   def encode({:f64, value}), do: <<value::float-64>>
 
-  @typedoc "Any vector (type of the vector itself)."
-  @type wasm_vec :: wasm_vec(wasm_node)
-  
-  @typedoc """
-  Vector of a specified type.
-
-      # Given the type 
-      wasm_vec(wasm_u32)
-
-      # An example tree
-      {:vec, [{:u32, 1}, {:u32, 2}, ...]}
-  """
-  @type wasm_vec(type) :: {:vec, [type]}
-  
   def encode({:vec, items}) do
     <<encode({:u32, length(items)})::binary,
       sequence(items)::binary>> 
   end
-
-  @typedoc """
-  Unicode name (UTF-8 encoded)
-    
-      {:name, "foobar"}
-  """
-  @type wasm_name :: binary
   
   def encode({:name, name}), do: <<name::utf8>>
-
-  # [Types](http://webassembly.github.io/spec/binary/types.html)
-  @type wasm_type :: wasm_valtype | wasm_resulttype | wasm_functype
-                   | wasm_limits | wasm_memtype | wasm_tabletype
-                   | wasm_globaltype
-
+ 
   # [Value Types](http://webassembly.github.io/spec/binary/types.html#value-types)
-  @type wasm_valtype :: :i32 | :i64 | :f32 | :f64
-  
   def encode(:i32), do: <<0x7F>>
   def encode(:i64), do: <<0xFE>>
   def encode(:f32), do: <<0x7D>>
   def encode(:f64), do: <<0x7C>>
 
   # [Result Types](http://webassembly.github.io/spec/syntax/types.html#result-types)
-  @type wasm_resulttype :: {:resulttype, [wasm_valtype]} 
   
   def encode({:resulttype, []}), do: <<0x40>>
   def encode({:resulttype, types}) when is_list(types), do: sequence(types)
 
   # [Function Types](http://webassembly.github.io/spec/syntax/types.html#value-types)
-  @type wasm_functype :: {:functype, wasm_vec(wasm_valtype), wasm_vec(wasm_valtype)}
   
   def encode({:functype, param_types, result_types}) do
     <<0x60,
@@ -142,7 +56,6 @@ defmodule WASM.Binary do
   end
   
   # [Limits](http://webassembly.github.io/spec/syntax/types.html#limits)
-  @type wasm_limits :: {:limits, non_neg_range | non_neg_integer}
 
   def encode({:limits, min..max}) do
     <<0x01, encode({:u32, min})::binary, encode({:u32, max})::binary>>
@@ -152,13 +65,11 @@ defmodule WASM.Binary do
   end
 
   # [Memory Types](http://webassembly.github.io/spec/syntax/types.html#memory-types)
-  @type wasm_memtype :: {:memtype, wasm_limits}
   
   def encode({:memtype, limit}), do: encode(limit)
 
   # [Table Types](http://webassembly.github.io/spec/syntax/types.html#table-types)
-  @type wasm_tabletype :: {:tabletype, wasm_elemtype, wasm_limits}
-  @type wasm_elemtype :: :elemtype
+
 
   def encode({:tabletype, elemtype, limits}) do
     <<encode(elemtype)::binary, encode(limits)::binary>>
@@ -166,7 +77,6 @@ defmodule WASM.Binary do
   def encode(:elemtype), do: <<0x70>>
 
   # [Global Types](http://webassembly.github.io/spec/syntax/types.html#global-types)
-  @type wasm_globaltype :: {:globaltype, :const | :var, wasm_valtype}
   
   def encode({:globaltype, :const, valtype}), do: <<0x00, encode(valtype)::binary>>
   def encode({:globaltype, :var, valtype}), do: <<0x01, encode(valtype)::binary>>
@@ -175,22 +85,16 @@ defmodule WASM.Binary do
   
   # []
 
-  @type wasm_instr :: wasm_unreachable | wasm_nop | wasm_block | wasm_loop
-                    | wasm_if
+
 
   
   # ["Nothing/Trap" Control Instructions](http://webassembly.github.io/spec/syntax/instructions.html#control-instructions)
-  @type wasm_nop :: :nop
-  @type wasm_unreachable :: :unreachable
+
 
   def encode(:unreachable), do: <<0x00>>
   def encode(:nop), do: <<0x01>>
 
   # ["Structured" Control Instructions](http://webassembly.github.io/spec/syntax/instructions.html#control-instructions)
-  @type wasm_block :: {:block, wasm_resulttype, [wasm_instr]}
-  @type wasm_loop :: {:loop, wasm_resulttype, [wasm_instr]}
-  @type wasm_if :: {:if, wasm_resulttype, [wasm_instr]}
-                 | {:if, wasm_resulttype, [wasm_instr], [wasm_instr]}
 
   @control_ops %{
     block: 0x02, loop: 0x03, if: 0x04 }
@@ -226,19 +130,6 @@ defmodule WASM.Binary do
   # TODO: All variable instructions
     
   # [Memory Instructions](http://webassembly.github.io/spec/binary/instructions.html#memory-instructions)
-  @type wasm_memarg :: {:memarg, unsigned_32_integer, unsigned_32_integer}
-  
-  @type wasm_load :: {:load, wasm_valtype, wasm_memarg}
-  @type wasm_load8_s :: {:load8_s, :i32 | :i64, wasm_memarg}
-  @type wasm_load8_u :: {:load8_s, :i32 | :i64, wasm_memarg}
-  @type wasm_load16_s :: {:load16_s, :i32 | :i64, wasm_memarg}
-  @type wasm_load16_u :: {:load16_u, :i32 | :i64, wasm_memarg} 
-  @type wasm_load32_s :: {:load32_u, :i64, wasm_memarg}
-  @type wasm_load32_u :: {:load32_s, :i64, wasm_memarg}
-  @type wasm_store :: {:store, wasm_valtype, wasm_memarg}
-  @type wasm_store8 :: {:store8, :i32 | :i64, wasm_memarg}
-  @type wasm_store16 :: {:store16, :i32 | :i64, wasm_memarg}
-  @type wasm_store32 :: {:store32, :i64, wasm_memarg}
 
   @mem_ops %{
     {:load, :i32} => 0x28,
@@ -282,7 +173,6 @@ defmodule WASM.Binary do
   end
 
   # ["Const" Numberic Instructions](http://webassembly.github.io/spec/binary/instructions.html#numeric-instructions)
-  @type wasm_const :: {:const, wasm_valtype, wasm_value}
 
   @const_ops %{
     i32: 0x41, i64: 0x42, f32: 0x43, f64: 0x44 }
@@ -546,16 +436,6 @@ defmodule WASM.Binary do
       @version::binary,
       sequence(sections)::binary>>
   end
-
-  # Generic types
-  @typep non_neg_range :: Range.t(non_neg_integer, non_neg_integer)
-  @typep unsigned_32_integer :: 0..0xFFFFFFFF
-  @typep unsigned_64_integer :: 0..0xFFFFFFFFFFFFFFFF
-  @typep signed_32_integer :: -0x80000000..0x7FFFFFFF
-  @typep signed_64_integer :: -0x8000000000000000..0x7FFFFFFFFFFFFFFF
-  # TODO: Better float generics
-  @typep float_32 :: float
-  @typep float_64 :: float
 
   # Compile sequence of instructions
   defp sequence(seq), do: Enum.map(seq, &encode(&1)) |> Enum.join

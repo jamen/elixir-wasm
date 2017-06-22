@@ -8,7 +8,7 @@
     <title>WASM.LEB128 – wasm v0.0.1</title>
     <link rel="stylesheet" href="dist/app-4ecae1abb8.css" />
     
-    <script src="dist/sidebar_items-bfa004e365.js"></script>
+    <script src="dist/sidebar_items-665ddee0a9.js"></script>
   </head>
   <body data-type="modules">
     <script>try { if(localStorage.getItem('night-mode')) document.body.className += ' night-mode'; } catch (e) { }</script>
@@ -72,6 +72,12 @@
       </h1>
 
       
+        <section id="moduledoc">
+          <p>For encoding signed and unsigned LEB128 integers</p>
+<p>Inspired from <code class="inline">Varint</code>’s encode functions</p>
+
+        </section>
+      
 
       
         <section id="summary" class="details-list">
@@ -130,12 +136,18 @@
     </a>
     <span class="signature">encode_signed(v)</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/leb128.ex#L7" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/leb128.ex#L15" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
     
     
+    
+      <div class="specs">
+        
+          <pre>encode_signed(integer) :: binary</pre>
+        
+      </div>
     
   </div>
   <section class="docstring">
@@ -151,12 +163,18 @@
     </a>
     <span class="signature">encode_unsigned(v)</span>
     
-      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/leb128.ex#L4" class="view-source" rel="help" title="View Source">
+      <a href="https://github.com/jamen/elixir-wasm/blob/master/lib/wasm/leb128.ex#L11" class="view-source" rel="help" title="View Source">
        <span class="icon-code" aria-hidden="true"></span>
        <span class="sr-only">View Source</span>
      </a>
     
     
+    
+      <div class="specs">
+        
+          <pre>encode_unsigned(non_neg_integer) :: binary</pre>
+        
+      </div>
     
   </div>
   <section class="docstring">
