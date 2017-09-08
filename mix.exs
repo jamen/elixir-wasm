@@ -3,7 +3,7 @@ defmodule WASM.Mixfile do
 
   def project do
     [app: :wasm,
-     description: "A Web Assembly IR for Elixir",
+     description: "WASM AST for Elixir",
      version: "0.0.1",
      elixir: "~> 1.1-dev",
      build_embedded: Mix.env == :prod,
