@@ -20,12 +20,12 @@ defmodule WASM.Compiler.Beam do
   def debug_info(module)
 
   # We get debug info from String and then replace
-  # functions in it with equivalents in ElixirScript.String.
+  # functions in it with equivalents in `WASM.Override`.
   # This is so that we don't include the unicode database
   # in our output
   def debug_info(String) do
     {:ok, info} = do_debug_info(String)
-    {:ok, ex_string_info} = do_debug_info(ElixirScript.String)
+    {:ok, ex_string_info} = do_debug_info(WASM.Override.String)
 
     definitions = replace_definitions(info.definitions, ex_string_info.definitions)
 
@@ -34,9 +34,9 @@ defmodule WASM.Compiler.Beam do
     {:ok, info}
   end
 
-  # Replace some modules with ElixirScript versions
+  # Replace some modules with `WASM.Override` versions
   def debug_info(module) when module in [Agent] do
-    case do_debug_info(Module.concat(ElixirScript, module)) do
+    case do_debug_info(Module.concat(WASM.Override, module)) do
       {:ok, info} ->
         {:ok, Map.put(info, :module, module)}
       e ->
