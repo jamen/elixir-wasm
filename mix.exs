@@ -3,14 +3,15 @@ defmodule WASM.Mixfile do
 
   def project do
     [app: :wasm,
-     description: "WASM AST for Elixir",
+     description: "WASM compiler for Elixir",
      version: "0.0.1",
      elixir: "~> 1.1-dev",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      source_url: "https://github.com/jamen/elixir-wasm",
      deps: deps(),
-     package: package()]
+     package: package()
+    ]
   end
 
   # Configuration for the OTP application
