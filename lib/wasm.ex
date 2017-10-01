@@ -1,9 +1,9 @@
 defmodule WASM do
   @moduledoc """
   Functions for encoding and decoding `WASM.IR` from the [Binary Format](http://webassembly.github.io/spec/binary)
-  
+
   This module _only_ deals with the binary format and **can output invalid code**
-  with improper use.  For something more high-level that includes validation, see 
+  with improper use.  For something more high-level that includes validation, see
 
     - `WASM`
     - `WASM.Module`
@@ -19,18 +19,18 @@ defmodule WASM do
 
   defp do_encode({:u32, value}), do: WASM.LEB128.encode_unsigned(value)
   defp do_encode({:u64, value}), do: WASM.LEB128.encode_unsigned(value)
-  
+
   defp do_encode({:s32, value}), do: WASM.LEB128.encode_signed(value)
   defp do_encode({:s64, value}), do: WASM.LEB128.encode_signed(value)
   defp do_encode({:i32, value}), do: WASM.LEB128.encode_signed(value)
   defp do_encode({:i64, value}), do: WASM.LEB128.encode_signed(value)
-    
+
   defp do_encode({:f32, value}), do: <<value::float-32>>
   defp do_encode({:f64, value}), do: <<value::float-64>>
 
   defp do_encode({:vec, items}) do
     <<do_encode({:u32, length(items)})::binary,
-      sequence(items)::binary>> 
+      sequence(items)::binary>>
   end
 
   defp do_encode({:name, name}), do: <<name::utf8>>
@@ -48,7 +48,7 @@ defmodule WASM do
       do_encode({:vec, param_types})::binary,
       do_encode({:vec, result_types})::binary>>
   end
-   
+
   defp do_encode({:limits, min..max}) do
     <<0x01, do_encode({:u32, min})::binary, do_encode({:u32, max})::binary>>
   end
@@ -63,7 +63,7 @@ defmodule WASM do
   end
 
   defp do_encode(:elem_type), do: <<0x70>>
-  
+
   defp do_encode({:global_type, :const, valtype}), do: <<0x00, do_encode(valtype)::binary>>
   defp do_encode({:global_type, :var, valtype}), do: <<0x01, do_encode(valtype)::binary>>
 
@@ -222,28 +222,24 @@ defmodule WASM do
     i32_trunc_s_f32: 0xA8,
     i32_trunc_u_f32: 0xA9,
   }
- 
-  defp do_encode(name)
-    when name == :unreachable
-    when name == :nop
-    when name == :drop
-    when name == :select
-    when name == :return
-  do
+
+  @instr_list Map.keys(@instr_op)
+  @unary_list [:unreachable, :nop, :drop, :select, :return]
+  @block_list [:block, :loop, :if]
+  @br_list [:br, :br_if, :br_table, :br_table]
+  @mem_list [:i32_load, :i64_load, :i32_load, :i64_load, :f32_load, :f64_load,
+    :i32_load8_s, :i32_load8_u, :i32_load16_s, :i32_load16_u, :i64_load8_s,
+    :i64_load8_u, :i64_load16_s, :i64_load16_u, :i64_load32_s, :i64_load32_u,
+    :i32_store, :i64_store, :f32_store, :f64_store, :i32_store8, :i32_store16,
+    :i64_store8, :i64_store16, :i64_store32]
+  @plain_list @instr_list -- (@unary_list ++ @block_list ++ @br_list ++ @mem_list)
+
+
+  defp do_encode(name) when name in @unary_list do
     <<@instr_op[name]>>
   end
 
-  defp do_encode({name, resulttype, instrs})
-    when name == :block
-    when name == :loop
-    when name == :if
-  do
-    <<@instr_op[name],
-      do_encode(resulttype)::binary,
-      sequence(instrs)::binary,
-      0x0b>>
-  end
-
+  # if/else instruction
   defp do_encode({:if, resulttype, consequent, alternate}) do
     <<@instr_op[:if],
       do_encode(resulttype)::binary,
@@ -253,43 +249,50 @@ defmodule WASM do
       0x0B>>
   end
 
-  defp do_encode({name, label_idx})
-    when name == :br
-    when name == :br_if
-  do
+  # misc block instruction
+  defp do_encode({name, resulttype, instrs}) when name in @block_list do
     <<@instr_op[name],
-      do_encode({:label_idx, label_idx})::binary>>
+      do_encode(resulttype)::binary,
+      sequence(instrs)::binary,
+      0x0b>>
   end
 
+  # br_table instruction
   defp do_encode({:br_table, label_indices, label_idx}) do
     <<@instr_op[:br_table],
       do_encode({:vec, Enum.map(label_indices, &{:label_idx, &1})})::binary,
       do_encode({:label_idx, label_idx})::binary>>
   end
 
-  defp do_encode({:call, func_idx}) do
-    <<@instr_op[:call],
+  # misc br instruction
+  defp do_encode({name, label_idx}) when name in @br_list and name != :br_table do
+    <<@instr_op[name],
+      do_encode({:label_idx, label_idx})::binary>>
+  end
+
+  # plain instruction
+  defp do_encode({name, folded_instr}) when name in @plain_list do
+    <<sequence(folded_instr)::binary, @instr_op[name]>>
+  end
+
+  defp do_encode({:call, func_idx, folded_instr}) do
+    <<sequence(folded_instr)::binary,
+      @instr_op[:call],
       do_encode({:func_idx, func_idx})::binary>>
   end
 
-  defp do_encode({:call_indirect, type_idx}) do
-    <<@instr_op[:call_indirect],
+  defp do_encode({:call_indirect, type_idx, folded_instr}) do
+    <<sequence(folded_instr)::binary,
+      @instr_op[:call_indirect],
       do_encode({:type_idx, type_idx})::binary>>
   end
 
-  defp do_encode({name, local_idx})
-    when name == :get_local
-    when name == :set_local
-    when name == :tee_local
-  do
+  defp do_encode({name, local_idx}) when name in [:get_local, :set_local, :tee_local] do
     <<@instr_op[name],
       do_encode({:local_idx, local_idx})::binary>>
   end
 
-  defp do_encode({name, global_idx})
-    when name == :get_global
-    when name == :set_global
-  do
+  defp do_encode({name, global_idx}) when name in [:get_global, :set_global] do
     <<@instr_op[name],
       do_encode({:global_idx, global_idx})::binary>>
   end
@@ -300,23 +303,12 @@ defmodule WASM do
   end
 
   defp do_encode({name, mem_arg})
-    when name == :i32_load when name == :i64_load
-    when name == :f32_load when name == :f64_load
-    when name == :i32_load8_s when name == :i32_load8_u
-    when name == :i32_load16_s when name == :i32_load16_u
-    when name == :i64_load8_s when name == :i64_load8_u
-    when name == :i64_load16_s when name == :i64_load16_u
-    when name == :i64_load32_s when name == :i64_load32_u
-    when name == :i32_store when name == :i64_store
-    when name == :f32_store when name == :f64_store
-    when name == :i32_store8 when name == :i32_store16
-    when name == :i64_store8 when name == :i64_store16
-    when name == :i64_store32
+    when name in @mem_list
   do
     <<@instr_op[name],
       do_encode(mem_arg)::binary>>
   end
- 
+
   @mut_from_const %{
     i32_const: :i32,
     i64_const: :i64,
@@ -324,67 +316,25 @@ defmodule WASM do
     f64_const: :f64
   }
 
-  defp do_encode({name, n})
-    when name == :i32_const when name == :i64_const
-    when name == :f32_const when name == :f64_const
-  do
+  @const_list Map.keys(@mut_from_const)
+
+  defp do_encode({name, n}) when name in @const_list do
     <<@instr_op[name], do_encode({@mut_from_const[name], n})::binary>>
-  end
-  
-  defp do_encode({name, folded_instr})
-    when name == :i32_eqz when name == :i32_eq when name == :i32_ne
-    when name == :i32_lt_s when name == :i32_lt_u when name == :i32_gt_s
-    when name == :i32_gt_u when name == :i32_le_s when name == :i32_le_u
-    when name == :i32_ge_s when name == :i32_ge_u when name == :i64_eqz
-    when name == :i64_eq when name == :i64_ne when name == :i64_lt_s
-    when name == :i64_lt_u when name == :i64_gt_s when name == :i64_gt_u
-    when name == :i64_le_s when name == :i64_le_u when name == :i64_ge_s
-    when name == :i64_ge_u when name == :f32_eq when name == :f32_ne
-    when name == :f32_lt when name == :f32_gt when name == :f32_le
-    when name == :f32_ge when name == :f64_eq when name == :f64_ne
-    when name == :f64_lt when name == :f64_gt when name == :f64_le
-    when name == :f64_ge when name == :i32_clz when name == :i32_ctz
-    when name == :i32_popcnt when name == :i32_add when name == :i32_sub
-    when name == :i32_mul when name == :i32_div_s when name == :i32_div_u
-    when name == :i32_rem_s when name == :i32_rem_u when name == :i32_and
-    when name == :i32_or when name == :i32_xor when name == :i32_shl
-    when name == :i32_shr_s when name == :i32_shr_u when name == :i32_rotl
-    when name == :i32_rotr when name == :i64_clz when name == :i64_ctz
-    when name == :i64_popcnt when name == :i64_add
-    when name == :i64_sub when name == :i64_mul  when name == :i64_div_s
-    when name == :i64_div_u when name == :i64_rem_s when name == :i64_rem_u
-    when name == :i64_and when name == :i64_or when name == :i64_xor
-    when name == :i64_shl when name == :i64_shr_s when name == :i64_shr_u
-    when name == :i64_rotl when name == :i64_rotr when name == :f32_abs
-    when name == :f32_neg when name == :f32_ceil when name == :f32_floor
-    when name == :f32_trunc when name == :f32_nearest when name == :f32_sqrt
-    when name == :f32_add when name == :f32_sub when name == :f32_mul
-    when name == :f32_div when name == :f32_min when name == :f32_max
-    when name == :f32_copysign when name == :f64_abs when name == :f64_neg
-    when name == :f64_ceil when name == :f64_floor when name == :f64_trunc
-    when name == :f64_nearest when name == :f64_sqrt when name == :f64_add
-    when name == :f64_sub when name == :f64_mul when name == :f64_div
-    when name == :f64_min when name == :f64_max when name == :f64_copysign 
-  do
-    <<sequence(folded_instr)::binary, @instr_op[name]>>
   end
 
   # expr instruction
   defp do_encode({:expr, ins}) when is_list(ins), do: <<sequence(ins)::binary, 0x0B>>
   defp do_encode({:expr, ins}), do: <<do_encode(ins)::binary, 0x0B>>
-
-  # Index encodings
-  defp do_encode({:type_idx, value}), do: do_encode({:u32, value})
-  defp do_encode({:func_idx, value}), do: do_encode({:u32, value})
-  defp do_encode({:table_idx, value}), do: do_encode({:u32, value})
-  defp do_encode({:mem_idx, value}), do: do_encode({:u32, value})
-  defp do_encode({:global_idx, value}), do: do_encode({:u32, value})
-  defp do_encode({:local_idx, value}), do: do_encode({:u32, value})
-  defp do_encode({:label_idx, value}), do: do_encode({:u32, value})
-
+  
+  # index
+  @idx_list [:type_idx, :func_idx, :table_idx, :mem_idx, :global_idx, :local_idx, :label_idx]
+  defp do_encode({name, value}) when name in @idx_list do
+    do_encode({:i32, value})
+  end
+  
+  # module
   @magic <<0x00, 0x61, 0x73, 0x6D>>
   @version <<0x01, 0x00, 0x00, 0x00>>
-
   defp do_encode({:module, sections}) do
      <<@magic, @version, sequence(sections)::binary>>
   end
@@ -404,25 +354,15 @@ defmodule WASM do
     data_sec: 11
   }
 
-  defp do_encode({sec, contents})
-    when sec == :type_sec
-    when sec == :import_sec
-    when sec == :func_sec
-    when sec == :table_sec
-    when sec == :mem_sec
-    when sec == :global_sec
-    when sec == :export_sec
-    when sec == :elem_sec
-    when sec == :code_sec
-    when sec == :data_sec
-  do
+  @section_list Map.keys(@section_id)
+  @section_non_vec_list [:custom_sec, :start_sec]
+  @section_vec_list @section_list -- @section_non_vec_list
+
+  defp do_encode({sec, contents}) when sec in @section_vec_list do
     section(@section_id[sec], {:vec, contents})
   end
 
-  defp do_encode({sec, contents})
-    when sec == :custom_sec
-    when sec == :start_sec
-  do
+  defp do_encode({sec, contents}) when sec in @section_non_vec_list do
     section(@section_id[sec], contents)
   end
 
@@ -437,7 +377,7 @@ defmodule WASM do
       {:mem_type, _mt} -> <<2, do_encode(desc)::binary>>
       {:global_type, _gt} -> <<3, do_encode(desc)::binary>>
     end
-    
+
     <<do_encode({:name, mod})::binary,
       do_encode({:name, name})::binary,
       desc::binary>>
@@ -513,4 +453,3 @@ defmodule WASM do
     |> Enum.join()
   end
 end
-
