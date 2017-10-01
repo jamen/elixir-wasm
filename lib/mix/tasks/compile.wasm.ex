@@ -16,7 +16,7 @@ defmodule Mix.Tasks.Compile.Wasm do
   ]
 
   @default_options [
-    input: "./lib/**/*.ex",
+    input: "./web/**/*.ex",
     output: "./_build/app.js",
     output_type: :js
   ]
@@ -33,7 +33,7 @@ defmodule Mix.Tasks.Compile.Wasm do
   end
 
   defp build_options(config, args) do
-    {opts, ^args, _invalid} = OptionParser.parse(args, @cli_options)
+    {opts, _args, _invalid} = OptionParser.parse(args, @cli_options)
     
     # Merge defaults/options/config into one
     opts = Keyword.merge(@default_options, opts, &merge_new/3)

@@ -35,7 +35,7 @@ defmodule WASM.Compiler.Beam do
   end
 
   # Replace some modules with `WASM.Override` versions
-  def debug_info(module) when module in [Agent] do
+  def debug_info(module) when module in [Agent, :erlang] do
     case do_debug_info(Module.concat(WASM.Override, module)) do
       {:ok, info} ->
         {:ok, Map.put(info, :module, module)}
