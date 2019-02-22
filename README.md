@@ -7,7 +7,7 @@ For more information, see the [WebAssembly spec](https://github.com/WebAssembly/
 
 ## Scope
 
-This module **does not compile Elixir to WebAssembly**, it lets Elixir encode a WebAssembly module using tuples that resemble the instructions.
+This module **does not compile Elixir to WebAssembly**, it lets Elixir encode a WebAssembly module using tuples of instructions.
 
 Please see [ElixirScript](https://github.com/elixirscript/elixirscript), where Elixir [will eventually](https://github.com/elixirscript/elixirscript/issues/454) compile to WebAssembly using this module.
 
@@ -17,6 +17,6 @@ See the [Hexdocs](https://hexdocs.pm/wasm).
 
 ## Testing
 
-The command wat2wasm` from [WABT](https://github.com/WebAssembly/wabt) needs to be available, because the tests compare Elixir-compiled WASM against WAT-compiled WASM for compatibility.
+The tests compare Elixir-compiled WASM and WAT-compiled WASM using the command `wat2wasm` (from the [WebAssembly Binary Toolkit](https://github.com/WebAssembly/wabt)), so this needs to be installed or else the tests will fail.
 
-After the tests run, you can inspect the WebAssembly binaries at `_build/test/*.wasm` with `wasm2wat`, `hexdump`, etc.
+After the tests, you can inspect the binaries at `_build/test/*.wasm` with `wasm2wat`, `hexdump`, etc.
