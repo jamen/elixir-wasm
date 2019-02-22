@@ -1,15 +1,15 @@
 
 # elixir-wasm
 
-Functions and types for [the WASM binary format](http://webassembly.github.io/spec/core/bikeshed/index.html#binary-format%E2%91%A0) (similar in purpose to [elixir-estree](https://github.com/elixirscript/elixir-estree)).  Note **it doesn't translate Elixir to WASM** but enables the possibility. See [ElixirScript](https://github.com/elixirscript) for progress on that front.
+Functions and types for encoding WebAssembly.
 
-## Install
+For more information, see the [WebAssembly spec](https://github.com/WebAssembly/spec), the [Binary section](http://webassembly.github.io/spec/core/bikeshed/index.html#binary-format%E2%91%A0), and the [types documented for this module](https://hexdocs.pm/wasm/Wasm.html).
 
-Add it to as a `mix.exs` dependency:
+## Scope
 
-```elixir
-{:wasm, "~> 0.1.0"}
-```
+This module **does not compile Elixir to WebAssembly**, it lets Elixir encode a WebAssembly module using tuples that resemble the instructions.
+
+Please see [ElixirScript](https://github.com/elixirscript/elixirscript), where Elixir [will eventually](https://github.com/elixirscript/elixirscript/issues/454) compile to WebAssembly using this module.
 
 ## Documentation
 
@@ -17,6 +17,6 @@ See the [Hexdocs](https://hexdocs.pm/wasm).
 
 ## Testing
 
-You must have [WABT](https://github.com/WebAssembly/wabt) to run `mix test`.  It uses `wat2wasm` to compare WAT-compiled WASM and Elixir-compiled WASM.
+The command wat2wasm` from [WABT](https://github.com/WebAssembly/wabt) needs to be available, because the tests compare Elixir-compiled WASM against WAT-compiled WASM for compatibility.
 
-You can find the binaries at `_build/test/*.wasm` to use with WABT tools, `hexdump`, `xxd`, etc.
+After the tests run, you can inspect the WebAssembly binaries at `_build/test/*.wasm` with `wasm2wat`, `hexdump`, etc.

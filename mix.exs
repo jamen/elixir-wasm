@@ -4,7 +4,7 @@ defmodule Wasm.Mixfile do
   def project do
     [app: :wasm,
      description: "WASM compiler for Elixir",
-     version: "0.1.0",
+     version: "0.2.0",
      elixir: "~> 1.1-dev",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
@@ -15,7 +15,7 @@ defmodule Wasm.Mixfile do
   end
 
   defp deps do
-    [{:ex_doc, ">= 0.0.0", only: :dev}]
+    [{:ex_doc, "~> 0.19", only: :dev}]
   end
 
   defp package do
